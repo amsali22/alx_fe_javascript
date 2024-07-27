@@ -37,5 +37,38 @@ function addQuote() {
     showRandomQuote();
 }
 
+// Function to create the "Add Quote" form
+function createAddQuoteForm() {
+    // Create the form element
+    const form = document.createElement("form");
+
+    // Create the input field for the quote text
+    const quoteTextInput = document.createElement("input");
+    quoteTextInput.type = "text";
+    quoteTextInput.id = "newQuoteText";
+    quoteTextInput.placeholder = "Enter quote text";
+    form.appendChild(quoteTextInput);
+
+    // Create the input field for the quote category
+    const quoteCategoryInput = document.createElement("input");
+    quoteCategoryInput.type = "text";
+    quoteCategoryInput.id = "newQuoteCategory";
+    quoteCategoryInput.placeholder = "Enter quote category";
+    form.appendChild(quoteCategoryInput);
+
+    // Create the submit button
+    const submitButton = document.createElement("button");
+    submitButton.type = "button";
+    submitButton.textContent = "Add Quote";
+    submitButton.addEventListener("click", addQuote);
+    form.appendChild(submitButton);
+
+    // Append the form to the document body
+    document.body.appendChild(form);
+}
+
+// Call the createAddQuoteForm function to create the form
+createAddQuoteForm();
+
 // Event listener for the "Show New Quote" button
 document.getElementById("newQuote").addEventListener("click", showRandomQuote);
