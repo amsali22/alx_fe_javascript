@@ -14,7 +14,7 @@ function showRandomQuote() {
 
     // Display the random quote in the quoteDisplay element
     const quoteDisplay = document.getElementById("quoteDisplay");
-    quoteDisplay.textContent = randomQuote.text;
+    quoteDisplay.innerHTML = randomQuote.text;
 }
 
 // Function to add a new quote
