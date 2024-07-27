@@ -40,7 +40,7 @@ function addQuote() {
     showRandomQuote();
 
     // Sync with server
-    syncWithServer();
+    syncQuotes();
 }
 
 // Function to export quotes to a JSON file
@@ -134,8 +134,8 @@ async function postQuotesToServer() {
     }
 }
 
-// Function to sync with the server
-async function syncWithServer() {
+// Function to sync quotes with the server
+async function syncQuotes() {
     await fetchQuotesFromServer();
     await postQuotesToServer();
 }
@@ -157,4 +157,4 @@ document.getElementById("exportQuotes").addEventListener("click", exportQuotes);
 document.getElementById("categoryFilter").addEventListener("change", filterQuotes);
 
 // Periodically sync with the server every 30 seconds
-setInterval(syncWithServer, 30000);
+setInterval(syncQuotes, 30000);
