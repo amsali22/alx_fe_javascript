@@ -8,8 +8,9 @@ let quotes = JSON.parse(localStorage.getItem('quotes')) || [
 
 // Function to display a random quote
 function showRandomQuote() {
-    const randomIndex = Math.floor(Math.random() * quotes.length);
-    const randomQuote = quotes[randomIndex];
+    const filteredQuotes = filterQuotesArray();
+    const randomIndex = Math.floor(Math.random() * filteredQuotes.length);
+    const randomQuote = filteredQuotes[randomIndex];
     const quoteDisplay = document.getElementById("quoteDisplay");
     quoteDisplay.innerHTML = randomQuote.text;
 
@@ -29,6 +30,7 @@ function addQuote() {
     document.getElementById("newQuoteText").value = "";
     document.getElementById("newQuoteCategory").value = "";
 
+    populateCategoryFilter();
     showRandomQuote();
 }
 
@@ -52,8 +54,33 @@ function importFromJsonFile(event) {
         quotes.push(...importedQuotes);
         localStorage.setItem('quotes', JSON.stringify(quotes));
         alert('Quotes imported successfully!');
+        populateCategoryFilter();
     };
     fileReader.readAsText(event.target.files[0]);
+}
+
+// Function to populate category filter dropdown
+function populateCategoryFilter() {
+    const categoryFilter = document.getElementById("categoryFilter");
+    const categories = ["all", ...new Set(quotes.map(quote => quote.category))];
+
+    categoryFilter.innerHTML = categories.map(category => `<option value="${category}">${category}</option>`).join("");
+
+    const lastSelectedCategory = localStorage.getItem('lastSelectedCategory') || 'all';
+    categoryFilter.value = lastSelectedCategory;
+}
+
+// Function to filter quotes based on selected category
+function filterQuotes() {
+    const selectedCategory = document.getElementById("categoryFilter").value;
+    localStorage.setItem('lastSelectedCategory', selectedCategory);
+    showRandomQuote();
+}
+
+// Function to filter quotes array based on selected category
+function filterQuotesArray() {
+    const selectedCategory = document.getElementById("categoryFilter").value;
+    return selectedCategory === 'all' ? quotes : quotes.filter(quote => quote.category === selectedCategory);
 }
 
 // Display the last viewed quote from session storage, if available
@@ -62,6 +89,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (lastViewedQuote) {
         document.getElementById("quoteDisplay").innerHTML = lastViewedQuote;
     }
+    populateCategoryFilter();
 });
 
 // Event listeners for buttons
