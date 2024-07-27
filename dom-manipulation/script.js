@@ -9,10 +9,13 @@ let quotes = JSON.parse(localStorage.getItem('quotes')) || [
 // Function to display a random quote
 function showRandomQuote() {
     const filteredQuotes = filterQuotesArray();
+    if (filteredQuotes.length === 0) {
+        document.getElementById("quoteDisplay").innerHTML = "No quotes available for the selected category.";
+        return;
+    }
     const randomIndex = Math.floor(Math.random() * filteredQuotes.length);
     const randomQuote = filteredQuotes[randomIndex];
-    const quoteDisplay = document.getElementById("quoteDisplay");
-    quoteDisplay.innerHTML = randomQuote.text;
+    document.getElementById("quoteDisplay").innerHTML = randomQuote.text;
 
     // Store the last viewed quote in session storage
     sessionStorage.setItem('lastViewedQuote', randomQuote.text);
@@ -90,6 +93,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById("quoteDisplay").innerHTML = lastViewedQuote;
     }
     populateCategoryFilter();
+    showRandomQuote(); // Show a random quote on initial load
 });
 
 // Event listeners for buttons
