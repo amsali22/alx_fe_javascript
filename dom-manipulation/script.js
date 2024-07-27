@@ -1,3 +1,6 @@
+// Constants
+const SERVER_URL = 'https://jsonplaceholder.typicode.com/posts'; // Example server URL
+
 // Load quotes from local storage or use default quotes
 let quotes = JSON.parse(localStorage.getItem('quotes')) || [
     { text: "Be yourself; everyone else is already taken.", category: "Category 1" },
@@ -35,6 +38,9 @@ function addQuote() {
 
     populateCategories();
     showRandomQuote();
+
+    // Sync with server
+    syncWithServer();
 }
 
 // Function to export quotes to a JSON file
@@ -95,6 +101,45 @@ function filterQuotesArray() {
     return selectedCategory === 'all' ? quotes : quotes.filter(quote => quote.category === selectedCategory);
 }
 
+// Function to fetch quotes from the server
+async function fetchQuotesFromServer() {
+    try {
+        const response = await fetch(SERVER_URL);
+        const serverQuotes = await response.json();
+        if (serverQuotes.length > 0) {
+            quotes = serverQuotes;
+            localStorage.setItem('quotes', JSON.stringify(quotes));
+            populateCategories();
+            showRandomQuote();
+        }
+    } catch (error) {
+        console.error('Error fetching quotes from server:', error);
+    }
+}
+
+// Function to post quotes to the server
+async function postQuotesToServer() {
+    try {
+        const response = await fetch(SERVER_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(quotes)
+        });
+        const result = await response.json();
+        console.log('Quotes posted to server:', result);
+    } catch (error) {
+        console.error('Error posting quotes to server:', error);
+    }
+}
+
+// Function to sync with the server
+async function syncWithServer() {
+    await fetchQuotesFromServer();
+    await postQuotesToServer();
+}
+
 // Display the last viewed quote from session storage, if available
 document.addEventListener('DOMContentLoaded', () => {
     const lastViewedQuote = sessionStorage.getItem('lastViewedQuote');
@@ -110,3 +155,6 @@ document.getElementById("newQuote").addEventListener("click", showRandomQuote);
 document.getElementById("importFile").addEventListener("change", importFromJsonFile);
 document.getElementById("exportQuotes").addEventListener("click", exportQuotes);
 document.getElementById("categoryFilter").addEventListener("change", filterQuotes);
+
+// Periodically sync with the server every 30 seconds
+setInterval(syncWithServer, 30000);
