@@ -1,5 +1,5 @@
-// Array of quote objects
-let quotes = [
+// Load quotes from local storage or use default quotes
+let quotes = JSON.parse(localStorage.getItem('quotes')) || [
     { text: "Be yourself; everyone else is already taken.", category: "Category 1" },
     { text: "I'm selfish, impatient and a little insecure. I make mistakes, I am out of control and at times hard to handle. But if you can't handle me at my worst, then you sure as hell don't deserve me at my best.", category: "Category 2" },
     { text: "A room without books is like a body without a soul.", category: "Category 1" },
@@ -8,67 +8,63 @@ let quotes = [
 
 // Function to display a random quote
 function showRandomQuote() {
-    // Get a random quote from the quotes array
     const randomIndex = Math.floor(Math.random() * quotes.length);
     const randomQuote = quotes[randomIndex];
-
-    // Display the random quote in the quoteDisplay element
     const quoteDisplay = document.getElementById("quoteDisplay");
     quoteDisplay.innerHTML = randomQuote.text;
+
+    // Store the last viewed quote in session storage
+    sessionStorage.setItem('lastViewedQuote', randomQuote.text);
 }
 
 // Function to add a new quote
 function addQuote() {
-    // Get the new quote text and category from the input fields
     const newQuoteText = document.getElementById("newQuoteText").value;
     const newQuoteCategory = document.getElementById("newQuoteCategory").value;
-
-    // Create a new quote object
     const newQuote = { text: newQuoteText, category: newQuoteCategory };
 
-    // Add the new quote to the quotes array
     quotes.push(newQuote);
+    localStorage.setItem('quotes', JSON.stringify(quotes));
 
-    // Clear the input fields
     document.getElementById("newQuoteText").value = "";
     document.getElementById("newQuoteCategory").value = "";
 
-    // Display the updated quotes
     showRandomQuote();
 }
 
-// Function to create the "Add Quote" form
-function createAddQuoteForm() {
-    // Create the form element
-    const form = document.createElement("form");
-
-    // Create the input field for the quote text
-    const quoteTextInput = document.createElement("input");
-    quoteTextInput.type = "text";
-    quoteTextInput.id = "newQuoteText";
-    quoteTextInput.placeholder = "Enter quote text";
-    form.appendChild(quoteTextInput);
-
-    // Create the input field for the quote category
-    const quoteCategoryInput = document.createElement("input");
-    quoteCategoryInput.type = "text";
-    quoteCategoryInput.id = "newQuoteCategory";
-    quoteCategoryInput.placeholder = "Enter quote category";
-    form.appendChild(quoteCategoryInput);
-
-    // Create the submit button
-    const submitButton = document.createElement("button");
-    submitButton.type = "button";
-    submitButton.textContent = "Add Quote";
-    submitButton.addEventListener("click", addQuote);
-    form.appendChild(submitButton);
-
-    // Append the form to the document body
-    document.body.appendChild(form);
+// Function to export quotes to a JSON file
+function exportQuotes() {
+    const quotesJson = JSON.stringify(quotes, null, 2);
+    const blob = new Blob([quotesJson], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "quotes.json";
+    a.click();
+    URL.revokeObjectURL(url);
 }
 
-// Call the createAddQuoteForm function to create the form
-createAddQuoteForm();
+// Function to import quotes from a JSON file
+function importFromJsonFile(event) {
+    const fileReader = new FileReader();
+    fileReader.onload = function(event) {
+        const importedQuotes = JSON.parse(event.target.result);
+        quotes.push(...importedQuotes);
+        localStorage.setItem('quotes', JSON.stringify(quotes));
+        alert('Quotes imported successfully!');
+    };
+    fileReader.readAsText(event.target.files[0]);
+}
 
-// Event listener for the "Show New Quote" button
+// Display the last viewed quote from session storage, if available
+document.addEventListener('DOMContentLoaded', () => {
+    const lastViewedQuote = sessionStorage.getItem('lastViewedQuote');
+    if (lastViewedQuote) {
+        document.getElementById("quoteDisplay").innerHTML = lastViewedQuote;
+    }
+});
+
+// Event listeners for buttons
 document.getElementById("newQuote").addEventListener("click", showRandomQuote);
+document.getElementById("exportQuotes").addEventListener("click", exportQuotes);
+document.getElementById("importFile").addEventListener("change", importFromJsonFile);
