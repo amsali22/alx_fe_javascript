@@ -33,7 +33,7 @@ function addQuote() {
     document.getElementById("newQuoteText").value = "";
     document.getElementById("newQuoteCategory").value = "";
 
-    populateCategoryFilter();
+    populateCategories();
     showRandomQuote();
 }
 
@@ -57,17 +57,26 @@ function importFromJsonFile(event) {
         quotes.push(...importedQuotes);
         localStorage.setItem('quotes', JSON.stringify(quotes));
         alert('Quotes imported successfully!');
-        populateCategoryFilter();
+        populateCategories();
     };
     fileReader.readAsText(event.target.files[0]);
 }
 
 // Function to populate category filter dropdown
-function populateCategoryFilter() {
+function populateCategories() {
     const categoryFilter = document.getElementById("categoryFilter");
     const categories = ["all", ...new Set(quotes.map(quote => quote.category))];
 
-    categoryFilter.innerHTML = categories.map(category => `<option value="${category}">${category}</option>`).join("");
+    // Clear previous options
+    categoryFilter.innerHTML = '';
+
+    // Append new options
+    categories.forEach(category => {
+        const option = document.createElement("option");
+        option.value = category;
+        option.textContent = category;
+        categoryFilter.appendChild(option);
+    });
 
     const lastSelectedCategory = localStorage.getItem('lastSelectedCategory') || 'all';
     categoryFilter.value = lastSelectedCategory;
@@ -92,11 +101,12 @@ document.addEventListener('DOMContentLoaded', () => {
     if (lastViewedQuote) {
         document.getElementById("quoteDisplay").innerHTML = lastViewedQuote;
     }
-    populateCategoryFilter();
+    populateCategories();
     showRandomQuote(); // Show a random quote on initial load
 });
 
 // Event listeners for buttons
 document.getElementById("newQuote").addEventListener("click", showRandomQuote);
-document.getElementById("exportQuotes").addEventListener("click", exportQuotes);
 document.getElementById("importFile").addEventListener("change", importFromJsonFile);
+document.getElementById("exportQuotes").addEventListener("click", exportQuotes);
+document.getElementById("categoryFilter").addEventListener("change", filterQuotes);
