@@ -64,6 +64,7 @@ function importFromJsonFile(event) {
         localStorage.setItem('quotes', JSON.stringify(quotes));
         alert('Quotes imported successfully!');
         populateCategories();
+        syncQuotes();
     };
     fileReader.readAsText(event.target.files[0]);
 }
@@ -111,6 +112,7 @@ async function fetchQuotesFromServer() {
             localStorage.setItem('quotes', JSON.stringify(quotes));
             populateCategories();
             showRandomQuote();
+            showNotification('Quotes synced with server!');
         }
     } catch (error) {
         console.error('Error fetching quotes from server:', error);
@@ -129,6 +131,7 @@ async function postQuotesToServer() {
         });
         const result = await response.json();
         console.log('Quotes posted to server:', result);
+        showNotification('Quotes posted to server!');
     } catch (error) {
         console.error('Error posting quotes to server:', error);
     }
@@ -138,6 +141,17 @@ async function postQuotesToServer() {
 async function syncQuotes() {
     await fetchQuotesFromServer();
     await postQuotesToServer();
+}
+
+// Function to show notifications
+function showNotification(message) {
+    const notification = document.createElement('div');
+    notification.className = 'notification';
+    notification.textContent = message;
+    document.body.appendChild(notification);
+    setTimeout(() => {
+        notification.remove();
+    }, 3000);
 }
 
 // Display the last viewed quote from session storage, if available
